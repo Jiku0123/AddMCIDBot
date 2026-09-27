@@ -50,3 +50,90 @@ bool Database::initialize(){
 
     return true;
 }
+
+bool Database::register_mcid(
+    const std::string &discord_id,
+    const std::string &edition,
+    const std::string &mcid
+    ){
+
+
+        return false;
+}
+
+bool Database::unregister_mcid(
+    const std::string &discord_id,
+    const std::string &edition
+    ){
+        const char* sql;
+
+        if(edition == "java"){
+            sql = "UPDATE users SET java_mcid = NULL WHERE discord_id =?;";
+        }else if(edition == "bedrock"){
+            sql = "UPDATE users SET bedrock_mcid = NULL WHERE discord_id =?;";
+        }else{
+            return false;
+        }
+
+        sqlite3_stmt* stmt = nullptr;
+
+        if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
+            return false;
+        }
+
+        if(sqlite3_bind_text(
+            stmt, 1, discord_id.c_str(), -1, SQLITE_TRANSIENT
+        ) != SQLITE_OK){
+            sqlite3_finalize(stmt);
+            return false;
+        }
+
+        int result = sqlite3_step(stmt);
+
+        sqlite3_finalize(stmt);
+
+        bool success = result == SQLITE_DONE && sqlite3_changes(db) > 0;
+
+        return success;
+}
+
+bool Database::get_mcid(
+    const std::string &discord_id,
+    const std::string &edition,
+    std::string &mcid
+    ){
+        const char* sql;
+
+        if(edition == "java"){
+            sql = "SELECT java_mcid FROM users WHERE discord_id = ?;";
+        }else if(edition == "bedrock"){
+            sql = "SELECT java_mcid FROM users WHERE discord_id = ?;";
+        }else{
+            return false;
+        }
+
+        sqlite3_stmt* stmt = nullptr;
+
+        if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
+            return false;
+        }
+
+        sqlite3_bind_text(
+            stmt, 1, discord_id.c_str(), -1, SQLITE_TRANSIENT
+        );
+
+        int result = sqlite3_step(stmt);
+
+        if(result == SQLITE_ROW){
+            const unsigned char* value = sqlite3_column_text(stmt, 0);
+
+            if(value != nullptr){
+                mcid = reinterpret_cast<const char*>(value);
+                sqlite3_finalize(stmt);
+                return true;
+            }
+        }
+
+        sqlite3_finalize(stmt);
+        return false;
+}
