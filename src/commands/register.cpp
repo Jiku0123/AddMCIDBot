@@ -1,4 +1,4 @@
-#include "register.hpp"
+#include "commands/register.hpp"
 
 #include <string>
 

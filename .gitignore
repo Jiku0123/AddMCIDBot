@@ -2,4 +2,5 @@
 
 build/
 
+.claude/
 .vscode/

@@ -1,4 +1,4 @@
-#include "db.hpp"
+#include "db/db.hpp"
 
 #include <iostream>
 
@@ -56,9 +56,51 @@ bool Database::register_mcid(
     const std::string &edition,
     const std::string &mcid
     ){
+        const char* sql;
 
+        if(edition == "java"){
+            sql = R"(
+                INSERT INTO users (discord_id, java_mcid)
+                VALUES (?, ?)
+                ON CONFLICT(discord_id)
+                DO UPDATE SET java_mcid = excluded.java_mcid
+                WHERE users.java_mcid IS NULL;
+            )";
+        }else if(edition == "bedrock"){
+            sql = R"(
+                INSERT INTO users (discord_id, bedrock_mcid)
+                VALUES (?, ?)
+                ON CONFLICT(discord_id)
+                DO UPDATE SET bedrock_mcid = excluded.bedrock_mcid
+                WHERE users.bedrock_mcid IS NULL;
+            )";
+        }else{
+            return false;
+        }
 
-        return false;
+        sqlite3_stmt* stmt = nullptr;
+
+        if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
+            std::cerr << "DB prepare error: " << sqlite3_errmsg(db) << "\n";
+            return false;
+        }
+
+        if(sqlite3_bind_text(stmt, 1, discord_id.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK){
+            sqlite3_finalize(stmt);
+            return false;
+        }
+
+        if(sqlite3_bind_text(stmt, 2, mcid.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK){
+            sqlite3_finalize(stmt);
+            return false;
+        }
+
+        int result = sqlite3_step(stmt);
+        bool success = result == SQLITE_DONE && sqlite3_changes(db) > 0;
+
+        sqlite3_finalize(stmt);
+
+        return success;
 }
 
 bool Database::unregister_mcid(
@@ -78,12 +120,11 @@ bool Database::unregister_mcid(
         sqlite3_stmt* stmt = nullptr;
 
         if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
+            std::cerr << "DB prepare error: " << sqlite3_errmsg(db) << "\n";
             return false;
         }
 
-        if(sqlite3_bind_text(
-            stmt, 1, discord_id.c_str(), -1, SQLITE_TRANSIENT
-        ) != SQLITE_OK){
+        if(sqlite3_bind_text(stmt, 1, discord_id.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK){
             sqlite3_finalize(stmt);
             return false;
         }
@@ -107,7 +148,7 @@ bool Database::get_mcid(
         if(edition == "java"){
             sql = "SELECT java_mcid FROM users WHERE discord_id = ?;";
         }else if(edition == "bedrock"){
-            sql = "SELECT java_mcid FROM users WHERE discord_id = ?;";
+            sql = "SELECT bedrock_mcid FROM users WHERE discord_id = ?;";
         }else{
             return false;
         }
@@ -115,12 +156,16 @@ bool Database::get_mcid(
         sqlite3_stmt* stmt = nullptr;
 
         if(sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK){
+            std::cerr << "DB prepare error: " << sqlite3_errmsg(db) << "\n";
             return false;
         }
 
-        sqlite3_bind_text(
+        if(sqlite3_bind_text(
             stmt, 1, discord_id.c_str(), -1, SQLITE_TRANSIENT
-        );
+        ) != SQLITE_OK){
+            sqlite3_finalize(stmt);
+            return false;
+        }
 
         int result = sqlite3_step(stmt);
 
