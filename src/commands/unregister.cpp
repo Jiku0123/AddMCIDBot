@@ -13,11 +13,11 @@ void commands::unregister_register(dpp::cluster& bot){
     );
 
     edition.add_choice(
-        dpp::command_option_choice("Java", std::string("Java"))
+        dpp::command_option_choice("Java", std::string("java"))
     );
 
     edition.add_choice(
-        dpp::command_option_choice("Bedrock", std::string("Bedrock"))
+        dpp::command_option_choice("Bedrock", std::string("bedrock"))
     );
 
     unregister_command.add_option(edition);

@@ -17,7 +17,7 @@ void commands::register_register(dpp::cluster& bot){
     );
 
     edition.add_choice(
-        dpp::command_option_choice("Bedrock", std::string("Bedrock"))
+        dpp::command_option_choice("Bedrock", std::string("bedrock"))
     );
 
     dpp::command_option mcid(

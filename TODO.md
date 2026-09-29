@@ -17,27 +17,27 @@
 
 ## WhitelistHandlers
 
-- [ ] `WhitelistHandlers::execute_command`が`bool`を返していない(`return`文が無く未定義動作、ビルド時にも`-Wreturn-type`警告が出ている)。`rcon.execute()`の戻り値(レスポンス文字列)を見て成功/失敗を判定して返すようにする
+- [x] `WhitelistHandlers::execute_command`が`bool`を返していない(`return`文が無く未定義動作、ビルド時にも`-Wreturn-type`警告が出ている)。`rcon.execute()`の戻り値(レスポンス文字列)を見て成功/失敗を判定して返すようにする
 
 ## register / unregister ハンドラ
 
-- [ ] `handlers::register_handler`が「既に登録済みか」のチェックで終わっており、その先(RCONでwhitelist追加 → 成功したらDB保存 → Discordへ返信)が未実装
+- [x] `handlers::register_handler`が「既に登録済みか」のチェックで終わっており、その先(RCONでwhitelist追加 → 成功したらDB保存 → Discordへ返信)が未実装
   - 順序注意: **先にRCONでwhitelist追加 → 成功したらDBに保存**。逆にするとDBとサーバーの状態がズレる
-- [ ] `handlers::unregister_handler`がDBから消すだけで、RCON側のwhitelist removeを一切呼んでいない。DBだけ消してもサーバーのホワイトリストには残ったままになる
+- [x] `handlers::unregister_handler`がDBから消すだけで、RCON側のwhitelist removeを一切呼んでいない。DBだけ消してもサーバーのホワイトリストには残ったままになる
   - 順序注意: **先にRCONでwhitelist削除 → 成功したらDBから消す**
-- [ ] `handlers::unregister_handler`の`else`節(未登録だった場合)の返信処理が空
-- [ ] `handlers::unregister_handler`のシグネチャが`dpp::slashcommand_t&`(non-const)で、`register_handler`は`const dpp::slashcommand_t&`。統一する
-- [ ] `unregister_handler`は`RconClient&`を受け取っていない。whitelist removeを呼ぶために引数追加が必要
+- [x] `handlers::unregister_handler`の`else`節(未登録だった場合)の返信処理が空
+- [x] `handlers::unregister_handler`のシグネチャが`dpp::slashcommand_t&`(non-const)で、`register_handler`は`const dpp::slashcommand_t&`。統一する
+- [x] `unregister_handler`は`RconClient&`を受け取っていない。whitelist removeを呼ぶために引数追加が必要
 
 ## edition文字列の表記ゆれ(バグ)
 
-- [ ] `commands/register.cpp`・`commands/unregister.cpp`のBedrockの選択肢値が`"Bedrock"`(大文字始まり)になっているが、`db.cpp`側の判定は`edition == "bedrock"`(小文字)。このままだとBedrock選択時にDB処理が常に失敗する。どちらかに統一する(小文字`"bedrock"`推奨、Javaと合わせる)
+- [x] `commands/register.cpp`・`commands/unregister.cpp`のBedrockの選択肢値が`"Bedrock"`(大文字始まり)になっているが、`db.cpp`側の判定は`edition == "bedrock"`(小文字)。このままだとBedrock選択時にDB処理が常に失敗する。どちらかに統一する(小文字`"bedrock"`推奨、Javaと合わせる)
 
 ## bot.cpp / main.cpp の配線漏れ
 
-- [ ] `bot.cpp`の`event_handler`で`unregister`コマンドのハンドラ呼び出しが空(`else if(command_name == "unregister"){ }`の中身が無い)
-- [ ] `Bot`コンストラクタで`commands::register_register(bot)`は呼んでいるが`commands::unregister_register(bot)`を呼んでいない → `/unregister`コマンド自体がDiscordに登録されない
-- [ ] `main.cpp`で`Bot bot(TOKEN, db, rcon);`を作った後、`bot.run()`を呼んでいない → プログラムがそのまま終了してしまう
+- [x] `bot.cpp`の`event_handler`で`unregister`コマンドのハンドラ呼び出しが空(`else if(command_name == "unregister"){ }`の中身が無い)
+- [x] `Bot`コンストラクタで`commands::register_register(bot)`は呼んでいるが`commands::unregister_register(bot)`を呼んでいない → `/unregister`コマンド自体がDiscordに登録されない
+- [x] `main.cpp`で`Bot bot(TOKEN, db, rcon);`を作った後、`bot.run()`を呼んでいない → プログラムがそのまま終了してしまう
 
 ## その他(後回しでOK)
 

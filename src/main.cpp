@@ -84,6 +84,7 @@ int main(){
     std::cout << "RCON connected\n";
 
     Bot bot(TOKEN, db, rcon);
+    bot.run();
 
     return 0;
 }

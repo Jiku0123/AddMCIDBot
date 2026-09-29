@@ -6,13 +6,13 @@
 
 class WhitelistHandlers{
 public:
-    WhitelistHandlers(RconClient& mcid);
+    WhitelistHandlers(RconClient& rcon);
 
-    bool add_java(const std::string& mcid);
-    bool remove_java(const std::string& mcid);
+    bool is_valid_mcid(const std::string& edition, const std::string& mcid);
 
-    bool add_bedrock(const std::string& mcid);
-    bool remove_bedrock(const std::string& mcid);
+    bool add(const std::string& edition, const std::string& mcid);
+
+    bool remove(const std::string& edition, const std::string& mcid);
 
 private:
     RconClient& rcon;

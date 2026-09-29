@@ -1,10 +1,12 @@
 #include "bot.hpp"
 #include "commands/register.hpp"
+#include "commands/unregister.hpp"
 #include "handlers/register.hpp"
 #include "handlers/unregister.hpp"
 
 Bot::Bot(const std::string& token, Database& db, RconClient& rcon) : bot(token), db(db), rcon(rcon){
     commands::register_register(bot);
+    commands::unregister_register(bot);
 }
 
 void Bot::event_handler(dpp::cluster& bot){
