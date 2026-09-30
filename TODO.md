@@ -42,4 +42,4 @@
 ## その他(後回しでOK)
 
 - [ ] RCON接続が切れた場合の再接続処理(現状は起動時に1回`connect()`するだけ)
-- [ ] `.env.example`の内容が実際に必要な環境変数(`DISCORD_TOKEN`, `RCON_HOST`, `RCON_PORT`, `RCON_PASSWORD`)と一致しているか確認
+- [x] `.env.example`の内容が実際に必要な環境変数(`DISCORD_TOKEN`, `RCON_HOST`, `RCON_PORT`, `RCON_PASSWORD`)と一致しているか確認
