@@ -5,6 +5,10 @@
 void commands::register_register(dpp::cluster& bot){
     dpp::slashcommand register_command;
 
+    register_command.set_name("register");
+    register_command.set_description("Register your MCID to the whitelist");
+    register_command.set_application_id(bot.me.id);
+
     dpp::command_option edition(
         dpp::co_string,
         "edition",

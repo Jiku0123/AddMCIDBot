@@ -5,6 +5,10 @@
 void commands::unregister_register(dpp::cluster& bot){
     dpp::slashcommand unregister_command;
 
+    unregister_command.set_name("unregister");
+    unregister_command.set_description("Unregister your MCID from the whitelist");
+    unregister_command.set_application_id(bot.me.id);
+
     dpp::command_option edition(
         dpp::co_string,
         "edition",

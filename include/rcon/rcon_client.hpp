@@ -18,6 +18,6 @@ public:
 
     bool connect();
     bool authenticate();
-    std::string execute(const std::string& command);
+    bool execute(const std::string& command, std::string& response);
     void disconnect();
 };

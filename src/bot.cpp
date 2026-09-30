@@ -5,8 +5,6 @@
 #include "handlers/unregister.hpp"
 
 Bot::Bot(const std::string& token, Database& db, RconClient& rcon) : bot(token), db(db), rcon(rcon){
-    commands::register_register(bot);
-    commands::unregister_register(bot);
 }
 
 void Bot::event_handler(dpp::cluster& bot){
@@ -25,6 +23,13 @@ void Bot::run(){
     bot.on_log(dpp::utility::cout_logger());
 
     event_handler(bot);
+
+    bot.on_ready([this](const dpp::ready_t& event){
+        if(dpp::run_once<struct register_bot_commands>()){
+            commands::register_register(bot);
+            commands::unregister_register(bot);
+        }
+    });
 
     bot.start(dpp::st_wait);
 }

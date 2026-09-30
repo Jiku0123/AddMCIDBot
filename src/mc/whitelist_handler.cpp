@@ -1,6 +1,7 @@
 #include "mc/whitelist_handler.hpp"
 
 #include <vector>
+#include <iostream>
 
 WhitelistHandlers::WhitelistHandlers(RconClient& rcon) : rcon(rcon){
 
@@ -29,7 +30,7 @@ bool WhitelistHandlers::add(const std::string& edition, const std::string& mcid)
     if(edition == "java"){
         return execute_command("whitelist add " + mcid);
     }else if(edition == "bedrock"){
-        return execute_command("fwhitelist add " + mcid);
+        return execute_command("fwhitelist add \"" + mcid + "\"");
     }
 
     return false;
@@ -39,17 +40,23 @@ bool WhitelistHandlers::remove(const std::string& edition, const std::string& mc
     if(edition == "java"){
         return execute_command("whitelist remove " + mcid);
     }else if(edition == "bedrock"){
-        return execute_command("fwhitelist remove " + mcid);
+        return execute_command("fwhitelist remove \"" + mcid + "\"");
     }
 
     return false;
 }
 
 bool WhitelistHandlers::execute_command(const std::string& command){
-    std::string response = rcon.execute(command);
+    std::string response;
+
+    if(!rcon.execute(command, response)){
+        return false;
+    }
+
+    std::cout << "[RCON] cmd=\"" << command << "\" response=\"" << response << "\"\n";
     
     if(response.empty()){
-        return false;
+        return true;
     }
 
     static const std::vector<std::string> success{

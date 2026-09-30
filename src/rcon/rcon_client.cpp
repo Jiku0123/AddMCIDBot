@@ -178,24 +178,25 @@ bool RconClient::send_packet(int request_id, int type, const std::string& body){
     );
 }
 
-std::string RconClient::execute(const std::string& command){
+bool RconClient::execute(const std::string& command, std::string& response){
     int request_id = 2;
     if(!send_packet(request_id, SERVERDATA_EXECCOMMAND, command)){
-        return "";
+        return false;
     }
 
     char header[4];
     if(!recv_all(socket_fd, header, 4)){
-        return "";
+        return false;
     }
     int32_t length = read_int32_le(header);
 
     std::string body_buf(length, '\0');
     if(!recv_all(socket_fd, &body_buf[0], length)){
-        return "";
+        return false;
     }
 
-    return body_buf.substr(8, length - 8 - 2);
+    response = body_buf.substr(8, length - 8 - 2);
+    return true;
 }
 
 void RconClient::disconnect(){

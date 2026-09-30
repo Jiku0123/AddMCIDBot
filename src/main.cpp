@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <filesystem>
 
 #include <dpp/dpp.h>
 #include <laserpants/dotenv-0.9.3/dotenv.h>
@@ -12,21 +13,26 @@
 
 int main(){
     dotenv::init();
-
+    
+    const char* TOKEN = std::getenv("DISCORD_TOKEN");
+    const char* HOST = std::getenv("RCON_HOST");
+    const char* PORT = std::getenv("RCON_PORT");
+    const char* PASSWORD = std::getenv("RCON_PASSWORD");
+    const char* DB_PATH = std::getenv("DB_PATH");
+    
+    std::filesystem::path db_path = DB_PATH ? DB_PATH : "data/mc.db";
+    if(db_path.has_parent_path()){
+        std::filesystem::create_directories(db_path.parent_path());
+    }
     Database db;
-
-    if(!db.open("../data/mc.db")){
+    
+    if(!db.open(db_path.string())){
         return 1;
     }
 
     if(!db.initialize()){
         return 1;
     }
-
-    const char* TOKEN = std::getenv("DISCORD_TOKEN");
-    const char* HOST = std::getenv("RCON_HOST");
-    const char* PORT = std::getenv("RCON_PORT");
-    const char* PASSWORD = std::getenv("RCON_PASSWORD");
 
     if (TOKEN == nullptr){
         std::cout << "TOKEN was not founded" << "\n";
